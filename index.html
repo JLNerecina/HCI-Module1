@@ -44,7 +44,9 @@
     <div id="destination-page" class="page">
         <section class="hero">
             <h2>Find Your Destination</h2>
-            <input id="search-bar" type="text" placeholder="Search destinations..." />
+            <div class="autocomplete-container" id="autocomplete-container"></div>
+
+            <button class="book-btn" onclick="searchDestination()">Search</button>
             <div id="recommendations"></div>
         </section>
     </div>

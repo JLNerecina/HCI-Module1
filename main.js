@@ -1,30 +1,7 @@
 // Simple mock data for destinations
-const destinations = [
-    {
-        name: "Bali, Indonesia",
-        location: "Indonesia",
-        price: "$1200",
-        rating: 4.8,
-        info: "A tropical paradise with beautiful beaches, vibrant culture, and lush landscapes.",
-        image: "https://images.unsplash.com/photo-1506744038136-46273834b3fb?auto=format&fit=crop&w=800&q=80"
-    },
-    {
-        name: "Kyoto, Japan",
-        location: "Japan",
-        price: "$1500",
-        rating: 4.7,
-        info: "Historic temples, cherry blossoms, and traditional tea houses await in Kyoto.",
-        image: "https://images.unsplash.com/photo-1464983953574-0892a716854b?auto=format&fit=crop&w=800&q=80"
-    },
-    {
-        name: "Santorini, Greece",
-        location: "Greece",
-        price: "$1800",
-        rating: 4.9,
-        info: "Famous for its stunning sunsets, white-washed buildings, and crystal-clear waters.",
-        image: "https://images.unsplash.com/photo-1507525428034-b723cf961d3e?auto=format&fit=crop&w=800&q=80"
-    }
-];
+const destinations = [];
+const apiKey = "2d04cb07c549410e9f43ae6a022c6eb9";
+var placeId = "";
 
 // Routing logic
 function showPage(page) {
@@ -44,6 +21,215 @@ function handleLogin(event) {
     renderDestinations(destinations);
 }
 
+/* 
+	The addressAutocomplete takes as parameters:
+  - a container element (div)
+  - callback to notify about address selection
+  - geocoder options:
+  	 - placeholder - placeholder text for an input element
+     - type - location type
+*/
+function addressAutocomplete(containerElement, callback, options) {
+  // create input element
+  var inputElement = document.createElement("input");
+  inputElement.setAttribute("type", "text");
+  inputElement.setAttribute("placeholder", options.placeholder);
+  containerElement.appendChild(inputElement);
+
+  // add input field clear button
+  var clearButton = document.createElement("div");
+  clearButton.classList.add("clear-button");
+  addIcon(clearButton);
+  clearButton.addEventListener("click", (e) => {
+    e.stopPropagation();
+    inputElement.value = '';
+    callback(null);
+    clearButton.classList.remove("visible");
+    closeDropDownList();
+  });
+  containerElement.appendChild(clearButton);
+
+  /* Current autocomplete items data (GeoJSON.Feature) */
+  var currentItems;
+
+  /* Active request promise reject function. To be able to cancel the promise when a new request comes */
+  var currentPromiseReject;
+
+  /* Focused item in the autocomplete list. This variable is used to navigate with buttons */
+  var focusedItemIndex;
+
+  /* Execute a function when someone writes in the text field: */
+  inputElement.addEventListener("input", function(e) {
+    var currentValue = this.value;
+
+    /* Close any already open dropdown list */
+    closeDropDownList();
+
+    // Cancel previous request promise
+    if (currentPromiseReject) {
+      currentPromiseReject({
+        canceled: true
+      });
+    }
+
+    if (!currentValue) {
+      clearButton.classList.remove("visible");
+      return false;
+    }
+
+    // Show clearButton when there is a text
+    clearButton.classList.add("visible");
+
+    /* Create a new promise and send geocoding request */
+    var promise = new Promise((resolve, reject) => {
+      currentPromiseReject = reject;
+
+      var url = `https://api.geoapify.com/v1/geocode/autocomplete?text=${encodeURIComponent(currentValue)}&limit=5&apiKey=${apiKey}`;
+      
+      if (options.type) {
+      	url += `&type=${options.type}`;
+      }
+
+      fetch(url)
+        .then(response => {
+          // check if the call was successful
+          if (response.ok) {
+            response.json().then(data => resolve(data));
+          } else {
+            response.json().then(data => reject(data));
+          }
+        });
+    });
+
+    promise.then((data) => {
+      currentItems = data.features;
+
+      /*create a DIV element that will contain the items (values):*/
+      var autocompleteItemsElement = document.createElement("div");
+      autocompleteItemsElement.setAttribute("class", "autocomplete-items");
+      containerElement.appendChild(autocompleteItemsElement);
+
+      /* For each item in the results */
+      data.features.forEach((feature, index) => {
+        /* Create a DIV element for each element: */
+        var itemElement = document.createElement("DIV");
+        /* Set formatted address as item value */
+        itemElement.innerHTML = feature.properties.formatted;
+
+        /* Set the value for the autocomplete text field and notify: */
+        itemElement.addEventListener("click", function(e) {
+          inputElement.value = currentItems[index].properties.formatted;
+          placeId = feature.properties.place_id
+          console.log(placeId);
+        
+          callback(currentItems[index]);
+
+          /* Close the list of autocompleted values: */
+          closeDropDownList();
+        });
+
+        autocompleteItemsElement.appendChild(itemElement);
+      });
+    }, (err) => {
+      if (!err.canceled) {
+        console.log(err);
+      }
+    });
+  });
+
+  /* Add support for keyboard navigation */
+  inputElement.addEventListener("keydown", function(e) {
+    var autocompleteItemsElement = containerElement.querySelector(".autocomplete-items");
+    if (autocompleteItemsElement) {
+      var itemElements = autocompleteItemsElement.getElementsByTagName("div");
+      if (e.keyCode == 40) {
+        e.preventDefault();
+        /*If the arrow DOWN key is pressed, increase the focusedItemIndex variable:*/
+        focusedItemIndex = focusedItemIndex !== itemElements.length - 1 ? focusedItemIndex + 1 : 0;
+        /*and and make the current item more visible:*/
+        setActive(itemElements, focusedItemIndex);
+      } else if (e.keyCode == 38) {
+        e.preventDefault();
+
+        /*If the arrow UP key is pressed, decrease the focusedItemIndex variable:*/
+        focusedItemIndex = focusedItemIndex !== 0 ? focusedItemIndex - 1 : focusedItemIndex = (itemElements.length - 1);
+        /*and and make the current item more visible:*/
+        setActive(itemElements, focusedItemIndex);
+      } else if (e.keyCode == 13) {
+        /* If the ENTER key is pressed and value as selected, close the list*/
+        e.preventDefault();
+        if (focusedItemIndex > -1) {
+          closeDropDownList();
+        }
+      }
+    } else {
+      if (e.keyCode == 40) {
+        /* Open dropdown list again */
+        var event = document.createEvent('Event');
+        event.initEvent('input', true, true);
+        inputElement.dispatchEvent(event);
+      }
+    }
+  });
+
+  function setActive(items, index) {
+    if (!items || !items.length) return false;
+
+    for (var i = 0; i < items.length; i++) {
+      items[i].classList.remove("autocomplete-active");
+    }
+
+    /* Add class "autocomplete-active" to the active element*/
+    items[index].classList.add("autocomplete-active");
+
+    // Change input value and notify
+    inputElement.value = currentItems[index].properties.formatted;
+    callback(currentItems[index]);
+  }
+
+  function closeDropDownList() {
+    var autocompleteItemsElement = containerElement.querySelector(".autocomplete-items");
+    if (autocompleteItemsElement) {
+      containerElement.removeChild(autocompleteItemsElement);
+    }
+
+    focusedItemIndex = -1;
+  }
+
+  function addIcon(buttonElement) {
+    var svgElement = document.createElementNS("http://www.w3.org/2000/svg", 'svg');
+    svgElement.setAttribute('viewBox', "0 0 24 24");
+    svgElement.setAttribute('height', "24");
+
+    var iconElement = document.createElementNS("http://www.w3.org/2000/svg", 'path');
+    iconElement.setAttribute("d", "M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z");
+    iconElement.setAttribute('fill', 'currentColor');
+    svgElement.appendChild(iconElement);
+    buttonElement.appendChild(svgElement);
+  }
+  
+    /* Close the autocomplete dropdown when the document is clicked. 
+  	Skip, when a user clicks on the input field */
+  document.addEventListener("click", function(e) {
+    if (e.target !== inputElement) {
+      closeDropDownList();
+    } else if (!containerElement.querySelector(".autocomplete-items")) {
+      // open dropdown list again
+      var event = document.createEvent('Event');
+      event.initEvent('input', true, true);
+      inputElement.dispatchEvent(event);
+    }
+  });
+
+}
+
+addressAutocomplete(document.getElementById("autocomplete-container"), (data) => {
+  console.log("Selected option: ");
+  console.log(data);
+}, {
+	placeholder: "Enter an address here"
+});
+
 // Render destination recommendations
 function renderDestinations(list) {
     const container = document.getElementById('recommendations');
@@ -62,10 +248,46 @@ function renderDestinations(list) {
 }
 
 // Search bar
-function handleSearch(event) {
-    const value = event.target.value.toLowerCase();
-    const filtered = destinations.filter(d => d.name.toLowerCase().includes(value) || d.location.toLowerCase().includes(value));
-    renderDestinations(filtered);
+async function searchDestination() {
+    
+    destinations.length = 0; // Clear previous results
+    var currentItems;
+
+    try {
+        //const searchInput = document.getElementById('search-bar').value.toLowerCase();
+
+        const response = await fetch(`https://api.geoapify.com/v2/places?categories=entertainment&filter=place:${placeId}&limit=15&apiKey=${apiKey}`);
+        
+        if(!response.ok) {
+            throw new Error('Could not fetch resource');
+        }
+        
+        const data = await response.json();
+        currentItems = data.features;
+
+
+        console.log("Searching for destinations...");
+        data.features.forEach((feature, index) => {
+
+            //debug
+            console.log(feature.properties.name);
+
+            destinations.push({
+                name: feature.properties.name,
+                location: feature.properties.formatted,
+                category: feature.properties.categories,
+                //price: "$1200" - to be added with billing options
+                //rating: 4.8 - integrate with yelp/google reviews api
+                //info: "A tropical paradise with beautiful beaches, vibrant culture, and lush landscapes.",
+                //image:
+            });
+        });
+    } catch (error) {
+        
+    }
+    
+    //const filtered = destinations.filter(d => d.name.toLowerCase().includes(searchInput) || d.location.toLowerCase().includes(searchInput));
+    renderDestinations(destinations);
 }
 
 // Show info page
@@ -84,5 +306,4 @@ function showInfo(idx) {
 window.onload = function() {
     showPage('home-page');
     document.getElementById('login-form').onsubmit = handleLogin;
-    document.getElementById('search-bar').oninput = handleSearch;
 };

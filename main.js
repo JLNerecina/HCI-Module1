@@ -1,6 +1,8 @@
 // Simple mock data for destinations
 const destinations = [];
-const apiKey = "2d04cb07c549410e9f43ae6a022c6eb9";
+const geoapifyApiKey = "2d04cb07c549410e9f43ae6a022c6eb9";
+const googleImagesApiKey = "AIzaSyChKz2Hl1IPvMlV9Br8i0rnpNR7E0-QrSE"; //extra:  AIzaSyDrpYODpfwSGCoLuP1WKPo4f-CJMVY4HEg
+const googleImagesCXKey = "b40a4a2ea5ea04def";
 var placeId = "";
 
 // Routing logic
@@ -84,7 +86,7 @@ function addressAutocomplete(containerElement, callback, options) {
     var promise = new Promise((resolve, reject) => {
       currentPromiseReject = reject;
 
-      var url = `https://api.geoapify.com/v1/geocode/autocomplete?text=${encodeURIComponent(currentValue)}&limit=5&apiKey=${apiKey}`;
+      var url = `https://api.geoapify.com/v1/geocode/autocomplete?text=${encodeURIComponent(currentValue)}&limit=5&apiKey=${geoapifyApiKey}`;
       
       if (options.type) {
       	url += `&type=${options.type}`;
@@ -249,14 +251,14 @@ function renderDestinations(list) {
 
 // Search bar
 async function searchDestination() {
-    
+
     destinations.length = 0; // Clear previous results
     var currentItems;
 
     try {
         //const searchInput = document.getElementById('search-bar').value.toLowerCase();
 
-        const response = await fetch(`https://api.geoapify.com/v2/places?categories=entertainment&filter=place:${placeId}&limit=15&apiKey=${apiKey}`);
+        const response = await fetch(`https://api.geoapify.com/v2/places?categories=entertainment,tourism&filter=place:${placeId}&limit=15&apiKey=${geoapifyApiKey}`);
         
         if(!response.ok) {
             throw new Error('Could not fetch resource');
@@ -267,21 +269,36 @@ async function searchDestination() {
 
 
         console.log("Searching for destinations...");
-        data.features.forEach((feature, index) => {
-
-            //debug
-            console.log(feature.properties.name);
+        for (const feature of data.features) {
+          if (feature.properties.name == undefined){
+            continue;
+          }
+          
+            console.log(feature.properties.name); //debug
+            var imgData = {};
+            //obtain image from google custom search api
+            try{
+              const str = feature.properties.name;
+              const query = str.replaceAll(' ', '+');
+              const response = await fetch(`https://www.googleapis.com/customsearch/v1?key=${googleImagesApiKey}&cx=${googleImagesCXKey}&q=${query}&searchType=image`);
+              imgData = await response.json();
+            }
+            catch(e){
+                console.log(e);
+                imgData.items = [{link: 'https://placehold.co/600x400?text=No+Image+:('}]; //placeholder image
+            }
 
             destinations.push({
                 name: feature.properties.name,
                 location: feature.properties.formatted,
                 category: feature.properties.categories,
+                image: imgData.items[0].link //first image result
                 //price: "$1200" - to be added with billing options
                 //rating: 4.8 - integrate with yelp/google reviews api
                 //info: "A tropical paradise with beautiful beaches, vibrant culture, and lush landscapes.",
                 //image:
-            });
-        });
+            })
+        }
     } catch (error) {
         
     }

@@ -1,7 +1,7 @@
 // Global Attributes
 const destinations = [];
 const geoapifyApiKey = "2d04cb07c549410e9f43ae6a022c6eb9";
-const googleImagesApiKey = "AIzaSyChKz2Hl1IPvMlV9Br8i0rnpNR7E0-QrSE"; //extra:  AIzaSyDrpYODpfwSGCoLuP1WKPo4f-CJMVY4HEg
+const googleImagesApiKey = "AIzaSyDrpYODpfwSGCoLuP1WKPo4f-CJMVY4HEg"; //extra:  AIzaSyDrpYODpfwSGCoLuP1WKPo4f-CJMVY4HEg  |  AIzaSyChKz2Hl1IPvMlV9Br8i0rnpNR7E0-QrSE
 const googleImagesCXKey = "b40a4a2ea5ea04def";
 var placeId = "";
 
@@ -36,6 +36,10 @@ fetch('https://places-api.foursquare.com/places/search?', options)
 
 
 function addressAutocomplete(containerElement, callback, options) {
+  // create a wrapper for the input and button
+  const inputContainer = document.createElement("div");
+  inputContainer.classList.add("input-container"); // Use this class for styling
+  containerElement.appendChild(inputContainer);
   // create input element
   var inputElement = document.createElement("input");
   inputElement.setAttribute("type", "text");
@@ -53,7 +57,7 @@ function addressAutocomplete(containerElement, callback, options) {
     clearButton.classList.remove("visible");
     closeDropDownList();
   });
-  containerElement.appendChild(clearButton);
+  inputContainer.appendChild(clearButton);
 
   /* Current autocomplete items data (GeoJSON.Feature) */
   var currentItems;
@@ -253,7 +257,6 @@ if (tabs) {
 
     // Show the corresponding tab content
     let contentId = e.target.textContent.toLowerCase();
-    // Handle mismatch between button text "Destinations" and div ID "destination-tab"
     const targetId = `${contentId}-tab`;
 
     document.querySelectorAll('[id$="-tab"]').forEach(p => {
@@ -263,21 +266,80 @@ if (tabs) {
 }
 
 function renderDestinations(list) {
-    const container = document.getElementById('recommendations');
+    const container = document.getElementById('search-results');
     container.innerHTML = '';
+    container.className = 'cards';
     list.forEach((dest, idx) => {
-        const card = document.createElement('div');
-        card.className = 'destination-card';
+        const card = document.createElement('article');
+        card.className = 'card';
         card.innerHTML = `
-            <img src="${dest.image}" alt="${dest.name}" />
-            <h3>${dest.name}</h3>
-            <p>${dest.location}</p>
-            <button onclick="showInfo(${idx})">View Info</button>
+            <img src="${dest.image}" alt="${dest.name}">
+            <div class="body">
+                <h3>${dest.name}</h3>
+                <div class="meta">${dest.location}</div>
+                <div class="cta"><button class="btn" onclick="showInfo(${idx})">View Info</button></div>
+            </div>
         `;
         container.appendChild(card);
     });
 }
 
+// Search bar
+async function searchDestination() {
+
+    destinations.length = 0; // Clear previous results
+    var currentItems;
+
+    try {
+        //const searchInput = document.getElementById('search-bar').value.toLowerCase();
+
+        const response = await fetch(`https://api.geoapify.com/v2/places?categories=entertainment,tourism&filter=place:${placeId}&limit=15&apiKey=${geoapifyApiKey}`);
+        
+        if(!response.ok) {
+            throw new Error('Could not fetch resource');
+        }
+        
+        const data = await response.json();
+        currentItems = data.features;
+
+        for (const feature of data.features) {
+          if (feature.properties.name == undefined){
+            continue;
+          }
+        
+            console.log(feature.properties.name); //debug
+            var imgData = {};
+            
+            //obtain image from google custom search api
+            try{
+              const str = feature.properties.name;
+              const query = str.replaceAll(' ', '+');
+              const response = await fetch(`https://www.googleapis.com/customsearch/v1?key=${googleImagesApiKey}&cx=${googleImagesCXKey}&q=${query}+outdoor+view&searchType=image`);
+              imgData = await response.json();
+            }
+            catch(e){
+                console.log(e);
+                imgData.items = [{link: 'https://placehold.co/600x400?text=No+Image+:('}]; //placeholder image
+            }
+
+            destinations.push({
+                name: feature.properties.name,
+                location: feature.properties.formatted,
+                category: feature.properties.categories,
+                image: imgData.items[0].link //first image result
+                //price: "$1200" - to be added with billing options
+                //rating: 4.8 - integrate with yelp/google reviews api
+                //info: "A tropical paradise with beautiful beaches, vibrant culture, and lush landscapes.",
+                //image:
+            })
+        }
+    } catch (error) {
+        
+    }
+    
+    //const filtered = destinations.filter(d => d.name.toLowerCase().includes(searchInput) || d.location.toLowerCase().includes(searchInput));
+    renderDestinations(destinations);
+}
 // Page navigation
 const nav = document.getElementById('nav');
 nav.addEventListener('click', e=>{
@@ -286,9 +348,13 @@ nav.addEventListener('click', e=>{
     go(e.target.dataset.page);
   }
 });
+
 function go(id){
   document.querySelectorAll('.page').forEach(p=>p.classList.remove('show'));
-  document.getElementById(id).classList.add('show');
+  const page = document.getElementById(id);
+  if (page) {
+    page.classList.add('show');
+  }
   document.querySelectorAll('.nav a').forEach(a=>a.classList.toggle('active', a.dataset.page===id));
   window.scrollTo({top:0,behavior:'smooth'});
 }

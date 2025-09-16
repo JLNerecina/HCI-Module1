@@ -234,17 +234,21 @@ addressAutocomplete(document.getElementById("autocomplete-container"), (data) =>
 
 // Render destination recommendations
 function renderDestinations(list) {
-    const container = document.getElementById('recommendations');
+    const container = document.getElementById('search-results');
+    container.className = 'cards'
     container.innerHTML = '';
     list.forEach((dest, idx) => {
         const card = document.createElement('div');
-        card.className = 'destination-card';
+        card.className = 'card';
         card.innerHTML = `
             <img src="${dest.image}" alt="${dest.name}" />
-            <h3>${dest.name}</h3>
-            <p>${dest.location}</p>
-            <button onclick="showInfo(${idx})">View Info</button>
-        `;
+            <div class="body">
+              <h3>${dest.name}</h3>
+              <div class = meta>${dest.location}</div>
+              <div class="cta"><button class="btn">See details</button></div>
+            </div>
+            `;
+            //^ <button onclick="showInfo(${idx})">View Info</button>
         container.appendChild(card);
     });
 }

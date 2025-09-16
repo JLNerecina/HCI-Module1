@@ -29,12 +29,13 @@
       <p class="sub">Where Plans Become Places</p>
 
       <div class="pilltabs" id="tabs">
-        <button>Flights</button>
-        <button>Hotels</button>
-        <button>Cars</button>
-        <button>Cruises</button>
-        <button>Packages</button>
+        <button>Home</button>
         <button>Destinations</button>
+        <button>Cars</button>
+        <button>Flights</button>
+        <button>Packages</button>
+        <button>Hotels</button>
+        <button>Cruises</button>
       </div>
 
       <div class="search-panel">
@@ -47,7 +48,6 @@
             <label>Check-out</label>
             <input type="date">
           </div>
-
           <!-- manual number inputs -->
           <div class="sr-item">
             <label for="rooms">Rooms</label>
@@ -61,79 +61,134 @@
             <label for="children">Children</label>
             <input id="children" type="number" min="0" max="20" value="0" inputmode="numeric">
           </div>
-
-          <div class="sr-cta">
+          <div class="sr-findRooms">
             <button class="btn" onclick="go('login')">Find Rooms</button>
           </div>
+
+          <div class="autocomplete-container" id="autocomplete-container"> 
+            <!--<input id="input" type="text" placeholder="Search destinations, hotels, etc.">-->
+          </div>
+
+          <div class="search-button">
+            <button class="btn" onclick="go('searchDestination')">Search</button>
+          </div>
+
         </div>
       </div>
     </section>
 
+    <!-- TABS -->
+    <!-- Home -->
     <!-- Top Deals -->
-    <section class="section">
-      <h2>Today's Top Deals</h2>
-      <div class="cards">
-        <article class="card">
-          <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQzCBVQA6OSwh2I8Z12RBnCAzIQAAvPlEUfmQ&s" alt="">
-          <div class="body"><h3>Royal Caribbean Cruise</h3><div class="meta">7 nights • from $799</div><div class="cta"><button class="btn">View deal</button></div></div>
-        </article>
-        <article class="card">
-          <img src="https://www.japanrailpass.com.au/wp-content/uploads/2012/07/Fujiyoshida-Japan-at-Chureito-Pagoda-and-Mt.-Fuji-in-the-spring-with-cherry-blossoms.jpg" alt="">
-          <div class="body"><h3>Tokyo, Japan Tour</h3><div class="meta">5 days • from $649</div><div class="cta"><button class="btn">View deal</button></div></div>
-        </article>
-        <article class="card">
-          <img src="https://miro.medium.com/1*etEyIncfV6ONq8XGW8Xb-g.jpeg" alt="">
-          <div class="body"><h3>Santorini Escape</h3><div class="meta">3 nights • from $499</div><div class="cta"><button class="btn">View deal</button></div></div>
-        </article>
-      </div>
-    </section>
+    <div id="home-tab">
+        <section class="section">
+        <h2>Today's Top Deals</h2>
+        <div class="cards">
+            <article class="card">
+            <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQzCBVQA6OSwh2I8Z12RBnCAzIQAAvPlEUfmQ&s" alt="">
+            <div class="body"><h3>Royal Caribbean Cruise</h3><div class="meta">7 nights • from $799</div><div class="cta"><button class="btn">View deal</button></div></div>
+            </article>
+            <article class="card">
+            <img src="https://www.japanrailpass.com.au/wp-content/uploads/2012/07/Fujiyoshida-Japan-at-Chureito-Pagoda-and-Mt.-Fuji-in-the-spring-with-cherry-blossoms.jpg" alt="">
+            <div class="body"><h3>Tokyo, Japan Tour</h3><div class="meta">5 days • from $649</div><div class="cta"><button class="btn">View deal</button></div></div>
+            </article>
+            <article class="card">
+            <img src="https://miro.medium.com/1*etEyIncfV6ONq8XGW8Xb-g.jpeg" alt="">
+            <div class="body"><h3>Santorini Escape</h3><div class="meta">3 nights • from $499</div><div class="cta"><button class="btn">View deal</button></div></div>
+            </article>
+        </div>
+        </section>
 
-    <!-- Recommended -->
-    <section class="section">
-      <h2>Recommended for You</h2>
-      <div class="cards">
-        <article class="card">
-          <img src="https://images.unsplash.com/photo-1459478309853-2c33a60058e7?q=80&w=1600&auto=format&fit=crop" alt="">
-          <div class="body"><h3>Road Trip USA</h3><div class="meta">Self-drive • 8 days</div><div class="cta"><button class="btn">See details</button></div></div>
-        </article>
-        <article class="card">
-          <img src="https://cdn.tripspoint.com/uploads/photos/8189/private-island-hopping-port-barton_Qjc91.jpeg" alt="">
-          <div class="body"><h3>Island Hopping</h3><div class="meta">Philippines • 6 days</div><div class="cta"><button class="btn">See details</button></div></div>
-        </article>
-        <article class="card">
-          <img src="https://d2e5ushqwiltxm.cloudfront.net/wp-content/uploads/sites/48/2024/08/16031252/Ba-Na-Hills-Da-Nang.png" alt="">
-          <div class="body"><h3>Ba Na Hills</h3><div class="meta">Vietnam • 4 days</div><div class="cta"><button class="btn">See details</button></div></div>
-        </article>
-        <article class="card">
-          <img src="https://images.unsplash.com/photo-1433838552652-f9a46b332c40?q=80&w=1600&auto=format&fit=crop" alt="">
-          <div class="body"><h3>Caribbean Break</h3><div class="meta">All-inclusive • 5 days</div><div class="cta"><button class="btn">See details</button></div></div>
-        </article>
-        <article class="card">
-          <img src="https://www.odysseys-unlimited.com/wp-content/uploads/2023/05/Lead-AdobeStock_328034199.jpeg" alt="">
-          <div class="body"><h3>Safari Classic</h3><div class="meta">Kenya • 7 days</div><div class="cta"><button class="btn">See details</button></div></div>
-        </article>
-        <article class="card">
-          <img src="https://images.unsplash.com/photo-1536098561742-ca998e48cbcc?q=80&w=1600&auto=format&fit=crop" alt="">
-          <div class="body"><h3>City & Culture</h3><div class="meta">London • 3 days</div><div class="cta"><button class="btn">See details</button></div></div>
-        </article>
-      </div>
-    </section>
+        <!-- Recommended -->
+        <section class="section">
+        <h2>Recommended for You</h2>
+        <div class="cards">
+            <article class="card">
+            <img src="https://images.unsplash.com/photo-1459478309853-2c33a60058e7?q=80&w=1600&auto=format&fit=crop" alt="">
+            <div class="body"><h3>Road Trip USA</h3><div class="meta">Self-drive • 8 days</div><div class="cta"><button class="btn">See details</button></div></div>
+            </article>
+            <article class="card">
+            <img src="https://cdn.tripspoint.com/uploads/photos/8189/private-island-hopping-port-barton_Qjc91.jpeg" alt="">
+            <div class="body"><h3>Island Hopping</h3><div class="meta">Philippines • 6 days</div><div class="cta"><button class="btn">See details</button></div></div>
+            </article>
+            <article class="card">
+            <img src="https://d2e5ushqwiltxm.cloudfront.net/wp-content/uploads/sites/48/2024/08/16031252/Ba-Na-Hills-Da-Nang.png" alt="">
+            <div class="body"><h3>Ba Na Hills</h3><div class="meta">Vietnam • 4 days</div><div class="cta"><button class="btn">See details</button></div></div>
+            </article>
+            <article class="card">
+            <img src="https://images.unsplash.com/photo-1433838552652-f9a46b332c40?q=80&w=1600&auto=format&fit=crop" alt="">
+            <div class="body"><h3>Caribbean Break</h3><div class="meta">All-inclusive • 5 days</div><div class="cta"><button class="btn">See details</button></div></div>
+            </article>
+            <article class="card">
+            <img src="https://www.odysseys-unlimited.com/wp-content/uploads/2023/05/Lead-AdobeStock_328034199.jpeg" alt="">
+            <div class="body"><h3>Safari Classic</h3><div class="meta">Kenya • 7 days</div><div class="cta"><button class="btn">See details</button></div></div>
+            </article>
+            <article class="card">
+            <img src="https://images.unsplash.com/photo-1536098561742-ca998e48cbcc?q=80&w=1600&auto=format&fit=crop" alt="">
+            <div class="body"><h3>City & Culture</h3><div class="meta">London • 3 days</div><div class="cta"><button class="btn">See details</button></div></div>
+            </article>
+        </div>
+        </section>
 
-    <!-- Mosaic -->
-    <section class="section">
-      <h2>Top Destinations</h2>
-      <div class="mosaic">
-        <div class="tile big"><img src="https://images.unsplash.com/photo-1502602898657-3e91760cbb34?q=80&w=1600&auto=format&fit=crop"><span>PARIS</span></div>
-        <div class="tile"><img src="https://www.travelandleisure.com/thmb/N_r_xMvHfYjCHgZE-9bAWNiVAwU=/1500x0/filters:no_upscale():max_bytes(150000):strip_icc()/TAL-conrad-maldives-rangali-island-MALDIVESHOTELS1024-6dfdeac00fec4f69893e7576b5896da9.jpg"><span>MALDIVES</span></div>
-        <div class="tile"><img src="https://www.visitlondon.com/-/media/images/london/visit/general-london/westminster-at-dusk-london-1280x720.jpg?rev=3c05b9713c4b4405a7ab61aaeba53636&mw=800&hash=061A930869789795BC82B1A060E14562"><span>LONDON</span></div>
-        <div class="tile tall"><img src="https://wander-lush.org/wp-content/uploads/2022/12/Most-beautiful-places-in-Morocco-DP-Sahara-Desert.jpg"><span>SAHARA</span></div>
-        <div class="tile"><img src="https://images.unsplash.com/photo-1540959733332-eab4deabeeaf?q=80&w=1600&auto=format&fit=crop"><span>TOKYO</span></div>
-        <div class="tile"><img src="https://www.asiaodysseytravel.com/images/china-tours/group-tours/beijing-jinshanling-great-wall-700-01.jpg"><span>BEIJING</span></div>
-        <div class="tile big"><img src="https://images.unsplash.com/photo-1469474968028-56623f02e42e?q=80&w=1600&auto=format&fit=crop"><span>LOS ANGELES</span></div>
-      </div>
-    </section>
-  </main>
+        <!-- Mosaic -->
+        <section class="section">
+        <h2>Top Destinations</h2>
+        <div class="mosaic">
+            <div class="tile big"><img src="https://images.unsplash.com/photo-1502602898657-3e91760cbb34?q=80&w=1600&auto=format&fit=crop"><span>PARIS</span></div>
+            <div class="tile"><img src="https://www.travelandleisure.com/thmb/N_r_xMvHfYjCHgZE-9bAWNiVAwU=/1500x0/filters:no_upscale():max_bytes(150000):strip_icc()/TAL-conrad-maldives-rangali-island-MALDIVESHOTELS1024-6dfdeac00fec4f69893e7576b5896da9.jpg"><span>MALDIVES</span></div>
+            <div class="tile"><img src="https://www.visitlondon.com/-/media/images/london/visit/general-london/westminster-at-dusk-london-1280x720.jpg?rev=3c05b9713c4b4405a7ab61aaeba53636&mw=800&hash=061A930869789795BC82B1A060E14562"><span>LONDON</span></div>
+            <div class="tile tall"><img src="https://wander-lush.org/wp-content/uploads/2022/12/Most-beautiful-places-in-Morocco-DP-Sahara-Desert.jpg"><span>SAHARA</span></div>
+            <div class="tile"><img src="https://images.unsplash.com/photo-1540959733332-eab4deabeeaf?q=80&w=1600&auto=format&fit=crop"><span>TOKYO</span></div>
+            <div class="tile"><img src="https://www.asiaodysseytravel.com/images/china-tours/group-tours/beijing-jinshanling-great-wall-700-01.jpg"><span>BEIJING</span></div>
+            <div class="tile big"><img src="https://images.unsplash.com/photo-1469474968028-56623f02e42e?q=80&w=1600&auto=format&fit=crop"><span>LOS ANGELES</span></div>
+        </div>
+        </section>
+    </div>
 
+    <div id="destinations-tab"> <!-- Display none -->
+        <section class="section">
+        <!--  <div class="autocomplete-container" id="autocomplete-container"></div>  -->
+        <h2>Available Flights</h2>
+        <p></p>
+        </section>
+    </main>
+
+    <div id="cars-tab"> <!-- Display none -->
+        <section class="section">
+        <h2>Available Transportation</h2>
+        <p>Riding functionality coming soon!</p>
+        </section>
+    </div>
+
+    <div id="flights-tab"> <!-- Display none -->
+        <section class="section">
+        <h2>Available Flights</h2>
+        <p>Flight booking functionality coming soon!</p>
+        </section>
+    </div>
+
+    <div id="packages-tab"> <!-- Display none -->
+        <section class="section">
+        <h2>Available Flights</h2>
+        <p>Flight booking functionality coming soon!</p>
+        </section>
+    </div>
+
+    <div id="hotels-tab"> <!-- Display none -->
+        <section class="section">
+        <h2>Accomodating Hotels</h2>
+        <p>Hotel booking functionality coming soon!</p>
+        </section>
+    </div>
+
+    <div id="cruises-tab"> <!-- Display none -->
+        <section class="section">
+        <h2>Available Cruises</h2>
+        <p>Cruise booking functionality coming soon!</p>
+        </section>
+    </div>
+
+    
   <!-- ===== LOGIN ===== -->
   <section id="login" class="page">
     <div class="login-wrap">

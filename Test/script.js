@@ -1,7 +1,10 @@
 // Global Attributes
 const destinations = [];
 const geoapifyApiKey = "2d04cb07c549410e9f43ae6a022c6eb9";
-const googleImagesApiKey = "AIzaSyDrpYODpfwSGCoLuP1WKPo4f-CJMVY4HEg"; //extra:  AIzaSyDrpYODpfwSGCoLuP1WKPo4f-CJMVY4HEg  |  AIzaSyChKz2Hl1IPvMlV9Br8i0rnpNR7E0-QrSE
+const googleImagesApiKey_1 = "AIzaSyChKz2Hl1IPvMlV9Br8i0rnpNR7E0-QrSE";
+const googleImagesApiKey_2 = "AIzaSyDrpYODpfwSGCoLuP1WKPo4f-CJMVY4HEg";
+const googleImagesApiKey_3 = "AIzaSyDNuN5_SX9Qruxanv2R7BFF6OD04hY9bB8";
+const googleImagesApiKey_4 = "AIzaSyDlFrGObqgsCX7c49OO1EMWusD8HJNpWI4";
 const googleImagesCXKey = "b40a4a2ea5ea04def";
 var placeId = "";
 
@@ -242,13 +245,17 @@ addressAutocomplete(document.getElementById("autocomplete-container"), (data) =>
 });
 
 
-// Objects go here
 
 
-// Tabs (visual only)
+// Show Tabs
 const tabs = document.getElementById('tabs');
 if (tabs) {
   tabs.querySelector('button')?.classList.add('active'); // Set initial active button
+
+  // Show the home tab content by default
+  document.querySelectorAll('[id$="-tab"]').forEach(p => {
+    p.style.display = p.id === 'home-tab' ? 'block' : 'none';
+  });
 
   tabs.addEventListener('click', e=>{
     if(e.target.tagName!=='BUTTON') return;
@@ -264,6 +271,13 @@ if (tabs) {
     });
   });
 }
+// Show Filters
+function showFilter() {
+  const searchPanel = document.querySelector('.search-panel');
+  if (searchPanel) {
+    searchPanel.classList.toggle('filters-open');
+  }
+}
 
 function renderDestinations(list) {
     const container = document.getElementById('search-results');
@@ -273,28 +287,37 @@ function renderDestinations(list) {
         const card = document.createElement('article');
         card.className = 'card';
         card.innerHTML = `
-            <img src="${dest.image}" alt="${dest.name}">
+            <img src="${dest.image}" alt="${dest.name}" onerror="this.onerror=null;this.src='https://placehold.co/600x400?text=No+Image+:(';">
             <div class="body">
                 <h3>${dest.name}</h3>
+                
                 <div class="meta">${dest.location}</div>
                 <div class="cta"><button class="btn" onclick="showInfo(${idx})">View Info</button></div>
             </div>
         `;
+        // add <h4>${dest.category}</h4> if regex is figured out
         container.appendChild(card);
     });
 }
 
 // Search bar
 async function searchDestination() {
-
     destinations.length = 0; // Clear previous results
     var currentItems;
 
+    var currentFilters = Array.from(document.querySelectorAll('input[name="category"]:checked')).map(checkbox => checkbox.value);
+    
+    //incase no finter is selected, select all
+    if (currentFilters.length === 0) {
+      currentFilters = ['entertainment', 'tourism', 'natural', 'national_park'];
+    }
+    
+    const currentFilterString = currentFilters.join(',');
+    console.log("Current Filters: " + currentFilterString); // Debug: Log the current filters
+
     try {
         //const searchInput = document.getElementById('search-bar').value.toLowerCase();
-
-        const response = await fetch(`https://api.geoapify.com/v2/places?categories=entertainment,tourism&filter=place:${placeId}&limit=15&apiKey=${geoapifyApiKey}`);
-        
+        const response = await fetch(`https://api.geoapify.com/v2/places?categories=${currentFilterString}&filter=place:${placeId}&limit=20&apiKey=${geoapifyApiKey}`);
         if(!response.ok) {
             throw new Error('Could not fetch resource');
         }
@@ -314,7 +337,7 @@ async function searchDestination() {
             try{
               const str = feature.properties.name;
               const query = str.replaceAll(' ', '+');
-              const response = await fetch(`https://www.googleapis.com/customsearch/v1?key=${googleImagesApiKey}&cx=${googleImagesCXKey}&q=${query}+outdoor+view&searchType=image`);
+              const response = await fetch(`https://www.googleapis.com/customsearch/v1?key=${googleImagesApiKey_1}&cx=${googleImagesCXKey}&q=${query}+outdoor+view&searchType=image`);
               imgData = await response.json();
             }
             catch(e){
@@ -322,11 +345,22 @@ async function searchDestination() {
                 imgData.items = [{link: 'https://placehold.co/600x400?text=No+Image+:('}]; //placeholder image
             }
 
+            var imgIndex = 0;
+            //forbids lookaside image links, they are broken
+            for (let i = 0; i < imgData.items.length; i++) {
+              if (['lookaside', 'tiktok', 'instagram', 'pinterest', 'fbcdn', 'twitter'].some(domain => imgData.items[imgIndex].link.includes(domain))){
+                  imgIndex++;
+              }
+              else{
+                break;
+              }
+            }
+
             destinations.push({
                 name: feature.properties.name,
                 location: feature.properties.formatted,
                 category: feature.properties.categories,
-                image: imgData.items[0].link //first image result
+                image: imgData.items[imgIndex].link //first image result
                 //price: "$1200" - to be added with billing options
                 //rating: 4.8 - integrate with yelp/google reviews api
                 //info: "A tropical paradise with beautiful beaches, vibrant culture, and lush landscapes.",

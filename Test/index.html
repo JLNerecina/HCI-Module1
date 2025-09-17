@@ -68,9 +68,37 @@
           <div class="autocomplete-container" id="autocomplete-container"> 
             <!--<input id="input" type="text" placeholder="Search destinations, hotels, etc.">-->
           </div>
+          
+          <div class="filter-button">
+            <button class="btn" onclick="showFilter()">Filters</button>
+          </div>
 
           <div class="search-button">
             <button class="btn" onclick="searchDestination()">Search</button>
+          </div>
+
+          <div class="sr-filters">
+            <h3>Filter by Categories:</h3>
+            <div class="filter-group">
+              <label><input type="checkbox" name="category" value="accommodation"> Accommodation</label>
+              <label><input type="checkbox" name="category" value="activity"> Activity</label>
+              <label><input type="checkbox" name="category" value="airport"> Airport</label>
+              <label><input type="checkbox" name="category" value="beach"> Beach</label>
+              <label><input type="checkbox" name="category" value="camping"> Camping</label>
+              <label><input type="checkbox" name="category" value="catering"> Catering</label>
+              <label><input type="checkbox" name="category" value="commercial"> Commercial</label>
+              <label><input type="checkbox" name="category" value="entertainment"> Entertainment</label>
+              <label><input type="checkbox" name="category" value="heritage"> Heritage</label>
+              <label><input type="checkbox" name="category" value="leisure"> Leisure</label>
+              <label><input type="checkbox" name="category" value="natural"> Natural</label>
+              <label><input type="checkbox" name="category" value="national_park"> National Park</label>
+              <label><input type="checkbox" name="category" value="rental"> Rental</label>
+              <label><input type="checkbox" name="category" value="religion"> Religion</label>
+              <label><input type="checkbox" name="category" value="tourism"> Tourism</label>
+              <label><input type="checkbox" name="category" value="ski"> Ski</label>
+              <label><input type="checkbox" name="category" value="sport"> Sport</label>
+              <label><input type="checkbox" name="category" value="adult"> Adult</label>
+            </div>
           </div>
 
         </div>

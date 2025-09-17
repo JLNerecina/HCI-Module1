@@ -337,7 +337,7 @@ async function searchDestination() {
             try{
               const str = feature.properties.name;
               const query = str.replaceAll(' ', '+');
-              const response = await fetch(`https://www.googleapis.com/customsearch/v1?key=${googleImagesApiKey_1}&cx=${googleImagesCXKey}&q=${query}+outdoor+view&searchType=image`);
+              const response = await fetch(`https://www.googleapis.com/customsearch/v1?key=${googleImagesApiKey_3}&cx=${googleImagesCXKey}&q=${query}+outdoor+view&searchType=image`);
               imgData = await response.json();
             }
             catch(e){

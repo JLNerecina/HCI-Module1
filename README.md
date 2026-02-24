@@ -108,7 +108,7 @@ We welcome contributions! Here's how you can help:
 - Project: HCI Module 1 - Selection of Place of Interest
 
 **fausturnacht**
-- GitHub: [@JLNerecina](https://github.com/fausturnacht)
+- GitHub: [@fausturnacht](https://github.com/fausturnacht)
 - Project: HCI Module 1 - Selection of Place of Interest
 
 ## 🙏 Acknowledgments

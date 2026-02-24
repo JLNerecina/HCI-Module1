@@ -107,6 +107,10 @@ We welcome contributions! Here's how you can help:
 - GitHub: [@JLNerecina](https://github.com/JLNerecina)
 - Project: HCI Module 1 - Selection of Place of Interest
 
+**fausturnacht**
+- GitHub: [@JLNerecina](https://github.com/fausturnacht)
+- Project: HCI Module 1 - Selection of Place of Interest
+
 ## 🙏 Acknowledgments
 
 - Inspired by modern travel booking platforms
